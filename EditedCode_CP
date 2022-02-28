@@ -1,0 +1,81 @@
+//Code Comments Typically come before the code, not after. Think of it as you leading the editor with context, not explaining what they just finished reading.
+//I have recommented the code with some samples of how i would write it.
+
+// ERIS BOT Source Code: from https://github.com/abalabahaha/eris
+// How to Setup A Discord Bot: https://www.freecodecamp.org/news/create-a-discord-bot-with-javascript-nodejs
+
+// Clarify the BOT class for the code
+const Eris = require("eris");
+
+// Token should be hidden in an .env file, but I can"t figure out how to do that here. This is a security risk, were this in the wild.
+const bot = new Eris("[replace with key from Discord Bot]", {
+    intents: ["guildMessages"]
+});
+
+//This array is used to check for input from the user to identify if a response is required.
+const SimulationWords =
+    ["simulation",
+    "simulacra",
+    "signs",
+    "misinformation",
+    "fake news"]
+
+//The next two arrays are quotes to be used for output by the bot
+//CHRIS -- Why have two array"s here? Are they going to be edited or managed separately? If not, just set these as one simple array and remove the need for the concatenates.
+const BarthesWords =
+    ["Sample A 1",
+    "Sample A 2",
+    "Sample A 3",
+    "Sample A 4",
+    "Sample A 5"];
+const BaudWords =
+    ["Sample B 1",
+    "Sample B 2",
+    "Sample B 3",
+    "Sample B 4",
+    "Sample B 5"];
+
+// Concatenate the two response arrays
+const theorywords = BarthesWords.concat(BaudWords);
+
+//CHRIS -- The original code for the random was listed as:
+//              const random = Math.floor(Math.random() * theorywords.length)
+//         I instead moved this down to Line# 62 and made it a single function, instead of predefined code.
+
+// When the bot is ready Log "Ready!"
+bot.on("ready", () => {
+    console.log("Ready!");
+});
+
+// Bot response if there is an error
+bot.on("error", (err) => {
+    console.error(err);
+});
+
+//When a new message is created containing items from the SimlationWords Array, respond with Random Output from theorywords array
+
+//Listen for new message
+bot.on("messageCreate", (msg) => {
+    //If message contains a simulation word
+    if (SimulationWords.some(word => msg.content.includes(word))) {
+        //randomly select a single theoryword from theorywords array
+        const theoryword = theorywords[Math.floor(Math.random() * theorywords.length)]
+        //output theoryword
+        bot.createMessage(msg.channel.id, theoryword)
+    }
+
+    //CHRIS -- Commenting out Lines 68 - 72 as this was re-written on Lines 58 - 65
+    //    if(msg.content === "SimulationWords") {
+    //        bot.createMessage(msg.channel.id, random);
+    // Send a message in the same channel with ...
+    //
+    //   }
+
+    // Otherwise, if the message is my name...respond thusly.
+    else if (msg.content === "Bauthrillard") {
+        bot.createMessage(msg.channel.id, "Delighted to make your acquaintance, you agent of metamodernism!");
+    }
+});
+
+// Get the bot to connect to Discord
+bot.connect();
